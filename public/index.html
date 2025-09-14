@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanTrack - Smart Waste Management</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">🌿</span>
+                    CleanTrack
+                </h1>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="ecoPoints">1250</span>
+                        <span class="stat-label">Eco Points</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <!-- Stats Dashboard -->
+                <div class="widget stats-widget">
+                    <h3 class="widget-title">📊 Live Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🗑️</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalBins">8</span>
+                                <span class="stat-text">Total Bins</span>
+                            </div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="fullBins">2</span>
+                                <span class="stat-text">Full Bins</span>
+                            </div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-icon">🚛</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="activeTrucks">3</span>
+                                <span class="stat-text">Active Trucks</span>
+                            </div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalHotspots">2</span>
+                                <span class="stat-text">Hotspots</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="widget filter-widget">
+                    <h3 class="widget-title">🔍 Filters</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" id="showBins" checked>
+                            <span class="checkmark"></span>
+                            Show Dustbins
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="showTrucks" checked>
+                            <span class="checkmark"></span>
+                            Show Trucks
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="showHotspots" checked>
+                            <span class="checkmark"></span>
+                            Show Hotspots
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="showRecycling" checked>
+                            <span class="checkmark"></span>
+                            Show Recycling Centers
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="widget action-widget">
+                    <h3 class="widget-title">⚡ Quick Actions</h3>
+                    <button class="action-btn primary" id="findNearestBtn">
+                        <span class="btn-icon">📍</span>
+                        Find Nearest Bin
+                    </button>
+                    <button class="action-btn danger" id="reportIssueBtn">
+                        <span class="btn-icon">⚠️</span>
+                        Report Issue
+                    </button>
+                    <button class="action-btn success" id="ecoTipsBtn">
+                        <span class="btn-icon">💡</span>
+                        Eco Tips
+                    </button>
+                </div>
+
+                <!-- Language Switch -->
+                <div class="widget language-widget">
+                    <h3 class="widget-title">🌐 Language</h3>
+                    <select id="languageSelect" class="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <main class="map-container">
+            <div id="map"></div>
+            
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <p>Loading CleanTrack...</p>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="status-indicator" id="statusIndicator">
+                <div class="status-dot"></div>
+                <span>Live</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Report Waste Issue</h2>
+                <button class="modal-close" id="closeReportModal">&times;</button>
+            </div>
+            <form id="reportForm" class="modal-body">
+                <div class="form-group">
+                    <label for="issueType">Issue Type</label>
+                    <select id="issueType" required>
+                        <option value="overflow">Bin Overflow</option>
+                        <option value="odour">Bad Odour</option>
+                        <option value="stray">Stray Garbage</option>
+                        <option value="damaged">Damaged Bin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="issueDescription">Description</label>
+                    <textarea id="issueDescription" rows="3" placeholder="Describe the issue..."></textarea>
+                </div>
+                <input type="hidden" id="reportLat">
+                <input type="hidden" id="reportLng">
+                <button type="submit" class="action-btn primary">Submit Report (+50 Eco Points)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Eco Tips Modal -->
+    <div id="ecoTipsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🌱 Eco-Friendly Tips</h2>
+                <button class="modal-close" id="closeEcoTipsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="eco-tips">
+                    <div class="tip-card">
+                        <div class="tip-icon">♻️</div>
+                        <h4>Separate Your Waste</h4>
+                        <p>Separate wet and dry waste to make recycling more effective.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🌿</div>
+                        <h4>Use Reusable Bags</h4>
+                        <p>Carry cloth or jute bags to reduce plastic waste.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">💧</div>
+                        <h4>Compost Organic Waste</h4>
+                        <p>Turn kitchen waste into nutrient-rich compost for plants.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🔄</div>
+                        <h4>Reduce, Reuse, Recycle</h4>
+                        <p>Follow the 3 R's to minimize your environmental impact.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Card (floating) -->
+    <div id="infoCard" class="info-card hidden">
+        <button class="info-close" id="closeInfoCard">&times;</button>
+        <div class="info-content">
+            <h3 id="infoTitle"></h3>
+            <p id="infoDetails"></p>
+            <div class="info-actions" id="infoActions"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span class="notification-icon">✅</span>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
