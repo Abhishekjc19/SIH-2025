@@ -1,13 +1,555 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CleanTrack - Smart Waste Management System</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBMP CleanTrack - Smart Waste Management</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🌿</span>
+                <span class="brand-text">BBMP CleanTrack</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link" onclick="showPage('home')">Home</a>
+                <a href="#" class="nav-link" onclick="showPage('login')" id="loginLink">Login</a>
+                <a href="#" class="nav-link" onclick="showPage('signup')" id="signupLink">Sign Up</a>
+                <a href="#" class="nav-link hidden" onclick="showPage('dashboard')" id="dashboardLink">Dashboard</a>
+                <a href="#" class="nav-link hidden" onclick="logout()" id="logoutLink">Logout</a>
+            </div>
+            <div class="nav-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Keep Bangalore Clean</h1>
+                <p class="hero-subtitle">Report waste issues, track progress, and help build a cleaner city together</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="showPage('signup')">Get Started</button>
+                    <button class="btn btn-secondary" onclick="showPage('login')">Login</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-card">
+                    <div class="card-icon">📱</div>
+                    <h3>Report Issues</h3>
+                    <p>Quickly report waste problems with photos and location</p>
+                </div>
+                <div class="hero-card">
+                    <div class="card-icon">📍</div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor the status of your complaints in real-time</p>
+                </div>
+                <div class="hero-card">
+                    <div class="card-icon">🏆</div>
+                    <h3>Earn Points</h3>
+                    <p>Get rewarded for contributing to a cleaner Bangalore</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">How CleanTrack Works</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📸</div>
+                        <h3>Report with Photos</h3>
+                        <p>Take photos of waste issues and submit detailed reports with location data</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🗺️</div>
+                        <h3>Interactive Maps</h3>
+                        <p>View all reported issues on an interactive map with real-time updates</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Quick Response</h3>
+                        <p>BBMP officials can quickly respond and update the status of reported issues</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Analytics Dashboard</h3>
+                        <p>Track progress with detailed analytics and performance metrics</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to your CleanTrack account</p>
+                </div>
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                </form>
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="#" onclick="showPage('signup')">Sign up</a></p>
+                    <p><a href="#" onclick="showPage('admin-login')">Admin Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signupPage" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Join CleanTrack</h2>
+                    <p>Create your account to start reporting issues</p>
+                </div>
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPhone">Phone Number</label>
+                        <input type="tel" id="signupPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <span class="checkmark"></span>
+                            I agree to the Terms of Service and Privacy Policy
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="#" onclick="showPage('login')">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Page -->
+    <div id="adminLoginPage" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Admin Login</h2>
+                    <p>BBMP Official Access</p>
+                </div>
+                <form id="adminLoginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="adminEmail">Admin Email</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminCode">Admin Code</label>
+                        <input type="text" id="adminCode" placeholder="Enter admin verification code" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Admin Login</button>
+                </form>
+                <div class="auth-footer">
+                    <p><a href="#" onclick="showPage('login')">Back to User Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="dashboardPage" class="page">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>Welcome, <span id="userName">User</span></h1>
+                <div class="user-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="userReports">0</div>
+                        <div class="stat-label">Reports Submitted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="userPoints">0</div>
+                        <div class="stat-label">Points Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="resolvedReports">0</div>
+                        <div class="stat-label">Issues Resolved</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="dashboard-sidebar">
+                    <div class="sidebar-menu">
+                        <button class="menu-item active" onclick="showDashboardSection('report')">
+                            <span class="menu-icon">📝</span>
+                            Report Issue
+                        </button>
+                        <button class="menu-item" onclick="showDashboardSection('my-reports')">
+                            <span class="menu-icon">📋</span>
+                            My Reports
+                        </button>
+                        <button class="menu-item" onclick="showDashboardSection('map')">
+                            <span class="menu-icon">🗺️</span>
+                            Map View
+                        </button>
+                        <button class="menu-item" onclick="showDashboardSection('leaderboard')">
+                            <span class="menu-icon">🏆</span>
+                            Leaderboard
+                        </button>
+                        <button class="menu-item" onclick="showDashboardSection('feedback')">
+                            <span class="menu-icon">💬</span>
+                            Feedback
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-main">
+                    <!-- Report Issue Section -->
+                    <div id="reportSection" class="dashboard-section active">
+                        <div class="section-header">
+                            <h2>Report a Waste Issue</h2>
+                            <p>Help keep Bangalore clean by reporting waste problems</p>
+                        </div>
+                        <form id="reportForm" class="report-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="issueCategory">Issue Category</label>
+                                    <select id="issueCategory" required>
+                                        <option value="">Select Category</option>
+                                        <option value="overflowing-bin">Overflowing Dustbin</option>
+                                        <option value="illegal-dumping">Illegal Dumping</option>
+                                        <option value="broken-bin">Broken Dustbin</option>
+                                        <option value="street-litter">Street Litter</option>
+                                        <option value="construction-waste">Construction Waste</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="priority">Priority Level</label>
+                                    <select id="priority" required>
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="issueLocation">Location</label>
+                                <input type="text" id="issueLocation" placeholder="Enter address or landmark" required>
+                                <button type="button" class="btn btn-secondary btn-small" onclick="getCurrentLocation()">Use Current Location</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="issueDescription">Description</label>
+                                <textarea id="issueDescription" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="issuePhoto">Upload Photo</label>
+                                <div class="file-upload">
+                                    <input type="file" id="issuePhoto" accept="image/*" multiple>
+                                    <div class="file-upload-text">
+                                        <span class="upload-icon">📷</span>
+                                        <span>Click to upload photos or drag and drop</span>
+                                    </div>
+                                </div>
+                                <div id="photoPreview" class="photo-preview"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                        </form>
+                    </div>
+
+                    <!-- My Reports Section -->
+                    <div id="myReportsSection" class="dashboard-section">
+                        <div class="section-header">
+                            <h2>My Reports</h2>
+                            <div class="filter-controls">
+                                <select id="statusFilter" onchange="filterReports()">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="reportsContainer" class="reports-container">
+                            <!-- Reports will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div id="mapSection" class="dashboard-section">
+                        <div class="section-header">
+                            <h2>Issue Map</h2>
+                            <div class="map-controls">
+                                <button class="btn btn-secondary" onclick="toggleHeatmap()">Toggle Heatmap</button>
+                                <select id="mapFilter" onchange="filterMapMarkers()">
+                                    <option value="all">All Issues</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="map" class="map-container"></div>
+                    </div>
+
+                    <!-- Leaderboard Section -->
+                    <div id="leaderboardSection" class="dashboard-section">
+                        <div class="section-header">
+                            <h2>Community Leaderboard</h2>
+                            <p>Top contributors to keeping Bangalore clean</p>
+                        </div>
+                        <div id="leaderboardContainer" class="leaderboard-container">
+                            <!-- Leaderboard will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div id="feedbackSection" class="dashboard-section">
+                        <div class="section-header">
+                            <h2>Feedback & Suggestions</h2>
+                            <p>Help us improve CleanTrack</p>
+                        </div>
+                        <form id="feedbackForm" class="feedback-form">
+                            <div class="form-group">
+                                <label for="feedbackType">Feedback Type</label>
+                                <select id="feedbackType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="suggestion">Suggestion</option>
+                                    <option value="bug-report">Bug Report</option>
+                                    <option value="feature-request">Feature Request</option>
+                                    <option value="general">General Feedback</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedbackRating">Overall Rating</label>
+                                <div class="rating-stars" id="ratingStars">
+                                    <span class="star" data-rating="1">⭐</span>
+                                    <span class="star" data-rating="2">⭐</span>
+                                    <span class="star" data-rating="3">⭐</span>
+                                    <span class="star" data-rating="4">⭐</span>
+                                    <span class="star" data-rating="5">⭐</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedbackMessage">Your Feedback</label>
+                                <textarea id="feedbackMessage" rows="5" placeholder="Share your thoughts..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboardPage" class="page">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>BBMP Admin Dashboard</h1>
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalReports">0</div>
+                        <div class="stat-label">Total Reports</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-number" id="pendingReports">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card progress">
+                        <div class="stat-number" id="inProgressReports">0</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                    <div class="stat-card resolved">
+                        <div class="stat-number" id="resolvedReportsAdmin">0</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <div class="admin-sidebar">
+                    <div class="sidebar-menu">
+                        <button class="menu-item active" onclick="showAdminSection('reports')">
+                            <span class="menu-icon">📋</span>
+                            All Reports
+                        </button>
+                        <button class="menu-item" onclick="showAdminSection('map-admin')">
+                            <span class="menu-icon">🗺️</span>
+                            Map View
+                        </button>
+                        <button class="menu-item" onclick="showAdminSection('analytics')">
+                            <span class="menu-icon">📊</span>
+                            Analytics
+                        </button>
+                        <button class="menu-item" onclick="showAdminSection('users')">
+                            <span class="menu-icon">👥</span>
+                            Users
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-main">
+                    <!-- All Reports Section -->
+                    <div id="reportsAdminSection" class="admin-section active">
+                        <div class="section-header">
+                            <h2>All Reports</h2>
+                            <div class="filter-controls">
+                                <select id="adminStatusFilter" onchange="filterAdminReports()">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                                <select id="adminCategoryFilter" onchange="filterAdminReports()">
+                                    <option value="all">All Categories</option>
+                                    <option value="overflowing-bin">Overflowing Dustbin</option>
+                                    <option value="illegal-dumping">Illegal Dumping</option>
+                                    <option value="broken-bin">Broken Dustbin</option>
+                                    <option value="street-litter">Street Litter</option>
+                                    <option value="construction-waste">Construction Waste</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="adminReportsContainer" class="admin-reports-container">
+                            <!-- Admin reports will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Admin Map Section -->
+                    <div id="mapAdminSection" class="admin-section">
+                        <div class="section-header">
+                            <h2>Reports Map</h2>
+                            <div class="map-controls">
+                                <button class="btn btn-secondary" onclick="toggleAdminHeatmap()">Toggle Heatmap</button>
+                                <select id="adminMapFilter" onchange="filterAdminMapMarkers()">
+                                    <option value="all">All Reports</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="adminMap" class="map-container"></div>
+                    </div>
+
+                    <!-- Analytics Section -->
+                    <div id="analyticsSection" class="admin-section">
+                        <div class="section-header">
+                            <h2>Analytics Dashboard</h2>
+                        </div>
+                        <div class="analytics-grid">
+                            <div class="analytics-card">
+                                <h3>Reports by Category</h3>
+                                <div id="categoryChart" class="chart-container">
+                                    <!-- Chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h3>Resolution Time</h3>
+                                <div id="resolutionChart" class="chart-container">
+                                    <!-- Chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h3>Monthly Trends</h3>
+                                <div id="trendsChart" class="chart-container">
+                                    <!-- Chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h3>Top Areas</h3>
+                                <div id="areasChart" class="chart-container">
+                                    <!-- Chart will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Section -->
+                    <div id="usersSection" class="admin-section">
+                        <div class="section-header">
+                            <h2>User Management</h2>
+                        </div>
+                        <div id="usersContainer" class="users-container">
+                            <!-- Users will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Report Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Report details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span class="notification-icon">✅</span>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
 </html>
